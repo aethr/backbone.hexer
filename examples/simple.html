@@ -38,22 +38,19 @@
             $(function() {
                 window.myHex = new Backbone.Hexer({
                     el: '#hexerTest',
-                    depth: 4,
+                    depth: 3,
                     size: '4em',
                     spacing: 0,
                     center: {x: '10em', y: '10em'}
                 });
                 myHex.render().
                       animate({
-                        animateFunction: function(hex) {
-                            hex.options.size = 5;
+                          animateFunction: function(hex) {
+                              hex.options.size = 5;
                             hex.render();
-//                            hex.$el.css({
-//                                marginTop: '4px'
-//                            });
-                        },
-                        delay: 50
-                    });
+                          },
+                          delay: 50
+                      });
             });
         })(jQuery);
     </script>

@@ -82,7 +82,6 @@
         switch (i) {
           // No Hexes have been created yet, make the first
           case 0:
-              console.log('0');
             this.addHex({
               distance: 0,
               x: this.options.center.x,
@@ -90,12 +89,7 @@
             });
             break;
 
-          // Only one Hex is present, ring it with 6 more
-          //case 1:
-          //  this.addAdjacentHexes(this.hexes[0], 0, 6);
-          //  this.addAdjacentHexes(this.hexes[1], 0, 6);
-          //  break;
-
+          // Find every Hex at the current depth and add Hexes around it!
           default:
             // This is complicated!
             var allEdgeHexes = getHexesAtDistance(i - 1, this.hexes);
@@ -215,7 +209,7 @@
         // Add the new Hex
         this.addAdjacentHex(originHex, i, {
           // Just an example, print the hex number inside each hex
-          content: _.partial(function(i) { return i; }, i)
+//          content: _.partial(function(count) { return count; }, this.hexes.length)
         });
       }
     },
