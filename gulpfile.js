@@ -10,26 +10,36 @@ var autoprefixer = require('gulp-autoprefixer');
 
 gulp.task('default', ['javascript', 'sass']);
 
+gulp.task('watch', function() {
+  var jsWatcher   = gulp.watch('backbone.hexer.js', ['javascript']);
+  var sassWatcher = gulp.watch('src/*.scss', ['sass']);
+
+  jsWatcher.on('change', function(event) {
+    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+  });
+  sassWatcher.on('change', function(event) {
+    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+  });
+});
+
 gulp.task('javascript', function() {
-  return gulp.src('src/backbone.hexer.js')
-      // This will output the non-minified version
-      .pipe(gulp.dest('./'))
-      // Initialise sourcemaps for minified js
-      .pipe(sourcemaps.init({loadMaps: true}))
-      // This will minify and rename to .min.js
-      .pipe(uglify())
-      .on('error', gutil.log)
-      .pipe(rename({ extname: '.min.js' }))
-      // Write the sourcemap
-      .pipe(sourcemaps.write('./'))
-      .pipe(gulp.dest('./'));
+  return gulp.src('backbone.hexer.js')
+    // Initialise sourcemaps for minified js
+    .pipe(sourcemaps.init({loadMaps: true}))
+    // This will minify and rename to .min.js
+    .pipe(uglify())
+    .on('error', gutil.log)
+    .pipe(rename({ extname: '.min.js' }))
+    // Write the sourcemap
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('sass', function () {
-    gulp.src('./src/*.scss')
-        .pipe(sourcemaps.init())
-        .pipe(autoprefixer())
-        .pipe(sass())
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('./'));
+  return gulp.src('./src/*.scss')
+    .pipe(sourcemaps.init())
+    .pipe(autoprefixer())
+    .pipe(sass())
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest('./'));
 });
