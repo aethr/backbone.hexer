@@ -53,6 +53,8 @@
 
       // Split convenient notations (ie '5em') into their value and unit
       this.options.unit     = this.options.size.replace( /^\d+/g, '');
+      if (this.options.unit == '') this.options.unit = 'em'; // Default to em
+      // Parse the numeric values into floats
       this.options.size     = parseFloatIfString(this.options.size);
       this.options.spacing  = parseFloatIfString(this.options.spacing);
       this.options.center.x = parseFloatIfString(this.options.center.x);
