@@ -238,24 +238,25 @@
 
       // Create a helper function that will help us execute a single animation
       // and then set a timeout for the next animation
-      var animateHelper = function (animateQueue, index, animateFunction, delay) {
+      var animateHelper = function (animateQueue, animateFunction, delay) {
         // Execute the animation on the current Hex
-        for (var i = 0; i < animateQueue[index].length; i++) {
-          animateFunction(animateQueue[index][i]);
+        var animationTargets = animateQueue.shift();
+        for (var i = 0; i < animationTargets.length; i++) {
+          animateFunction(animationTargets[i]);
         }
 
         // If we haven't gotten to the end of the list, set a timer for the
         // next animation to occur
-        if (index + 1 < animateQueue.length) {
+        if (animateQueue.length) {
           // Store a reference to the timeout in case we want to end early
           this.animateTimeout = setTimeout(function() {
-            animateHelper(animateQueue, index + 1, animateFunction, delay);
+            animateHelper(animateQueue, animateFunction, delay);
           }, params.delay);
         }
       }
 
       // Kick off the first animation straight away
-      animateHelper(params.animateQueue, 0, params.animateFunction, params.delay);
+      animateHelper(_.clone(params.animateQueue), params.animateFunction, params.delay);
     }
 
   });
