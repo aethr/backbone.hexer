@@ -81,19 +81,19 @@
              *   An array of arrays, with each sub-array containing Hexes of
              *   equal distance.
              */
-            function splitByDistance(hexList) {
+            function splitByDistance(hexes) {
                 // Determine an animation order and animate
                 var slices = [],
                     hexesAdded = 0,
                     currentDistance = 0;
 
                 // Keep adding Hexes until they have all been added
-                while (hexesAdded < myHex.hexes.length) {
+                while (hexesAdded < hexes.length) {
                     // Collect all the Hexes at the current distance
                     var newHexes = [];
-                    for (var i = 0; i < myHex.hexes.length; i++) {
-                        if (myHex.hexes[i].options.distance == currentDistance) {
-                            newHexes.push(myHex.hexes[i]);
+                    for (var i = 0; i < hexes.length; i++) {
+                        if (hexes[i].options.distance == currentDistance) {
+                            newHexes.push(hexes[i]);
                             hexesAdded++;
                         }
                     }
