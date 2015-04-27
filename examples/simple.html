@@ -66,9 +66,10 @@
                         });
                     },
                     // In what order should the Hexes be animated
-                    animateQueue: splitByDistance(myHex.hexes),
+//                    animateQueue: splitByDistance(myHex.hexes),
+                    animateQueue: spiralWalk(myHex.hexes),
                     // How long to delay between animation actions
-                    delay: 450
+                    delay: 150
                 });
             });
 
@@ -83,26 +84,114 @@
              */
             function splitByDistance(hexes) {
                 // Determine an animation order and animate
-                var slices = [],
-                    hexesAdded = 0,
+                var localHexes = _.clone(hexes),
+                    animateQueue = [],
                     currentDistance = 0;
 
-                // Keep adding Hexes until they have all been added
-                while (hexesAdded < hexes.length) {
+                // Keep adding Hexes until there are none left to add
+                while (localHexes.length > 0) {
                     // Collect all the Hexes at the current distance
-                    var newHexes = [];
-                    for (var i = 0; i < hexes.length; i++) {
-                        if (hexes[i].options.distance == currentDistance) {
-                            newHexes.push(hexes[i]);
-                            hexesAdded++;
+                    var hexGroup = [];
+                    for (var i = 0; i < localHexes.length; i++) {
+                        if (localHexes[i].options.distance == currentDistance) {
+                            // Place the current Hex in the array with others
+                            // of the same distance
+                            hexGroup.push(localHexes[i]);
+
+                            // Remove the Hex from the local array so it won't
+                            // be processed twice
+                            localHexes.splice(i, 1);
+                            i--; // We are modifying the list during traversal!
                         }
                     }
                     // Add the array of Hexes at this distance to the result
-                    slices.push(newHexes);
+                    animateQueue.push(hexGroup);
                     currentDistance++;
                 }
 
-                return slices;
+                return animateQueue;
+            }
+
+            function spiralOrder(hexes) {
+                // Determine an animation order and animate
+                var localHexes   = _.clone(hexes);
+
+                // Add a 'weight' property to each Hex
+                localHexes[0].weight = 0;
+                for (var i = 1; i < localHexes.length; i++) {
+                    var hex       = localHexes[i],
+                        neighbors = localHexes[i].options.neighbors,
+                        edges     = Object.keys(neighbors),
+                        closestEdge = null;
+                    // Find the neighbor hex with the lowest defined weight
+                    for (var e = 0; e < edges.length; e++) {
+                        var neighbor = neighbors[edges[e]];
+                        // If the neighbor being examined hasn't had a weight
+                        // set, it is useless to us at the moment!
+                        if (_.isUndefined(neighbor.weight)) {
+                            continue;
+                        }
+                        // If closestEdge is unset, of closer than the current
+                        // edge, replace it
+                        if (_.isNull(closestEdge)
+                            || (!_.isUndefined(hex.options.neighbors[closestEdge].weight) && neighbor.weight < hex.options.neighbors[closestEdge].weight)) {
+                            closestEdge = edges[e];
+                        }
+                    }
+                    var edgeFromNeighbor = (parseInt(closestEdge) + 3 > 5) ? parseInt(closestEdge) - 3 : parseInt(closestEdge) + 3,
+                        edgeWeight       = 1 + parseInt(edgeFromNeighbor);
+                    hex.weight = (hex.options.neighbors[closestEdge].weight * 6) + edgeWeight;
+                }
+
+                // Sort by the computed weight
+                localHexes.sort(function(a,b) {return a.weight - b.weight});
+                // Place each element in a separate array so that the animation
+                // occurs one hex at a time
+                return localHexes.map(function(currentValue, index, array) { return [currentValue]; });
+            }
+
+            function spiralWalk(hexes) {
+                // Determine an animation order and animate
+                var localHexes     = _.clone(hexes),
+                    startHex       = localHexes.shift(),
+                    currentHex     = startHex,
+                    direction      = 1,
+                    edgeCounter    = 0,
+                    animationQueue = [];
+
+                while (localHexes.length) {
+                    // Add the current hex to the animation queue
+                    animationQueue.push([currentHex]);
+                    localHexes.splice(localHexes.indexOf(currentHex), 1);
+
+                    // Find the next Hex in the sequence
+                    if (edgeCounter > 0) {
+                        currentHex = currentHex.options.neighbors[direction];
+                        edgeCounter--;
+                    } else {
+                        // If the last direction was 0, we've reached the end
+                        // of a full circuit
+                        if (direction == 1) {
+                            if (_.isUndefined(startHex.options.neighbors[0])) {
+                                // We have reached the end of the outer ring
+                                break;
+                            }
+                            // Advance to the next ring outwards, resetting
+                            // walk values
+                            currentHex  = startHex.options.neighbors[0];
+                            startHex    = currentHex;
+                            direction   = 2;
+                            edgeCounter = currentHex.options.distance - 1;
+                        } else {
+                            currentHex = currentHex.options.neighbors[direction];
+                            direction = (direction == 5) ? 0 : direction + 1;
+                            edgeCounter = currentHex.options.distance - 1;
+                        }
+
+                    }
+                }
+                animationQueue.push([currentHex]);
+                return animationQueue;
             }
 
         })(jQuery);
