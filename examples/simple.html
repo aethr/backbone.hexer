@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="../backbone.hexer.css"/>
     <style type="text/css" media=screen>
 .bbh-hex {
-  opacity: 0.8;
-  transition: all 150ms ease-in-out;
-  -webkit-transition: all 150ms ease-in-out;
+  opacity: 0.4;
+  transition: all 500ms ease-in-out;
+  -webkit-transition: all 500ms ease-in-out;
   background-image: -ms-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
   background-image: -moz-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
   background-image: -o-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
@@ -36,22 +36,75 @@
     <script type="text/javascript">
         (function($) {
             $(function() {
+                // Construct a hex grid 4 deep, with the centre near 12x12em
                 window.myHex = new Backbone.Hexer({
                     el: '#hexerTest',
-                    depth: 3,
+                    depth: 4,
                     size: '4em',
                     spacing: 0,
-                    center: {x: '10em', y: '10em'}
+                    center: {x: '12em', y: '12em'}
                 });
-                myHex.render().
-                      animate({
-                          animateFunction: function(hex) {
-                              hex.options.size = 5;
-                            hex.render();
-                          },
-                          delay: 50
-                      });
+
+                // Render all the Hexes as HTML elements
+                myHex.render();
+
+                // Animate the Hexes
+                myHex.animate({
+                    // How do we want each individual Hex to be altered during
+                    // animate?
+                    animateFunction: function(hex) {
+                        // Reset the hex to styles based on its internal
+                        // properties
+                        hex.render();
+
+                        // Transform is used to move the hexes to their x/y
+                        // position, so instead of replacing it, lets add to it
+                        var transform = hex.$el.css('transform');
+                        hex.$el.css({
+                            opacity: '1',
+                            transform: transform + ' rotate(120deg)'
+                        });
+                    },
+                    // In what order should the Hexes be animated
+                    animateQueue: splitByDistance(myHex.hexes),
+                    // How long to delay between animation actions
+                    delay: 450
+                });
             });
+
+            /**
+             * Given an array of Hexes, split them into multiple arrays,
+             * grouped by their distance property.
+             * @param hexList
+             *   The list of Hexes to split
+             * @returns {Array}
+             *   An array of arrays, with each sub-array containing Hexes of
+             *   equal distance.
+             */
+            function splitByDistance(hexList) {
+                // Determine an animation order and animate
+                var slices = [],
+                    hexesAdded = 0,
+                    currentDistance = 0;
+
+                // Keep adding Hexes until they have all been added
+                while (hexesAdded < myHex.hexes.length) {
+                    // Collect all the Hexes at the current distance
+                    var newHexes = [];
+                    for (var i = 0; i < myHex.hexes.length; i++) {
+                        if (myHex.hexes[i].options.distance == currentDistance) {
+                            newHexes.push(myHex.hexes[i]);
+                            hexesAdded++;
+                        }
+                    }
+                    // Add the array of Hexes at this distance to the result
+                    slices.push(newHexes);
+                    currentDistance++;
+                }
+
+                return slices;
+            }
+
         })(jQuery);
     </script>
 

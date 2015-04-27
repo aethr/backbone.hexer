@@ -221,7 +221,9 @@
      *
      * @param options
      *   An object which specifies how to animate the Hexes.  Valid keys are:
-     *   order: an array of Hexes, in the order you want to animate them.
+     *   animateQueue: a priority queue (array of arrays) of Hexes, with the
+     *     top-level array determining the order of animation.  All hexes in
+     *     the first
      *   animateFunction: a function with a single argument for a Hex.  This
      *     function will be called once on each Hex provided in order.
      *   delay: the number of ms to delay in between animating each Hex.
@@ -230,28 +232,30 @@
       // Set some sane defaults for the animation
       var params = _.extend({
         animateFunction: function(hex) { /* Do something! */ },
-        order: this.hexes,
+        animateQueue: [this.hexes],
         delay: 50
       }, options);
 
       // Create a helper function that will help us execute a single animation
       // and then set a timeout for the next animation
-      var animateHelper = function (hexList, index, animateFunction, delay) {
+      var animateHelper = function (animateQueue, index, animateFunction, delay) {
         // Execute the animation on the current Hex
-        animateFunction(hexList[index]);
+        for (var i = 0; i < animateQueue[index].length; i++) {
+          animateFunction(animateQueue[index][i]);
+        }
 
         // If we haven't gotten to the end of the list, set a timer for the
         // next animation to occur
-        if (index + 1 < hexList.length) {
+        if (index + 1 < animateQueue.length) {
           // Store a reference to the timeout in case we want to end early
           this.animateTimeout = setTimeout(function() {
-            animateHelper(hexList, index + 1, animateFunction, delay);
+            animateHelper(animateQueue, index + 1, animateFunction, delay);
           }, params.delay);
         }
       }
 
       // Kick off the first animation straight away
-      animateHelper(params.order, 0, params.animateFunction, params.delay);
+      animateHelper(params.animateQueue, 0, params.animateFunction, params.delay);
     }
 
   });
