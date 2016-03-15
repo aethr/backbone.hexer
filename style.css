@@ -1,0 +1,23 @@
+.bbh-hex {
+    opacity: 0.4;
+    transition: all 500ms ease-in-out;
+    -webkit-transition: all 500ms ease-in-out;
+    background-image: -ms-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
+    background-image: -moz-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
+    background-image: -o-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
+    background-image: -webkit-gradient(radial, left top, 0, left top, 993, color-stop(0, #BFBFBF), color-stop(1, #636363));
+    background-image: -webkit-radial-gradient(left top, circle farthest-corner, #BFBFBF 0%, #636363 100%);
+    background-image: radial-gradient(circle farthest-corner at left top, #BFBFBF 0%, #636363 100%);
+}
+.bbh-hex .content {
+    font-size: 2em;
+}
+
+.example {
+    display: block;
+    min-height: 400px;
+    width: 400px;
+}
+
+#example-1 {
+}
