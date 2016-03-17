@@ -62,6 +62,13 @@
 
       _.bindAll(this, 'addAdjacentHexes');
 
+      // Add the hex clip svg to the document so it can be used in the
+      // clip-path: url(...); format in firefox
+      // This is a hack so the developer doesm't need to include the svg in
+      // every document
+      var $div = $('<svg width="0" height="0"><defs><clipPath id="bbh-hexclip" clipPathUnits="objectBoundingBox"><polygon points="0.5 0 1 0.25 1 0.75 0.5 1 0 0.75 0 0.25"/></clipPath></defs></svg>');
+      document.body.insertBefore($div[0], document.body.childNodes[0]);
+
       // Create all the Hexes
       this.createHexViews();
     },
@@ -292,6 +299,8 @@
 
     render: function() {
       var cssProps = {
+        clipPath: "url(#bbh-hexclip)",
+        webkitClipPath: "url(#bbh-hexclip)",
         transform: 'translateX(' + this.options.x + this.options.unit + ') translateY(' + this.options.y + this.options.unit + ')',
         webkitTransform: 'translateX(' + this.options.x + this.options.unit + ' translateY(' + this.options.y + this.options.unit + ')',
         width:  (Math.sqrt(3)/2 * this.options.size) + this.options.unit, // width is smaller than height
